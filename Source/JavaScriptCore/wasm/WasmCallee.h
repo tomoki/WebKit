@@ -84,47 +84,47 @@ protected:
     FixedVector<HandlerInfo> m_exceptionHandlers;
 };
 
-class JITCallee : public Callee {
-public:
-    friend class Callee;
-    FixedVector<UnlinkedWasmToWasmCall>& wasmToWasmCallsites() { return m_wasmToWasmCallsites; }
-
-protected:
-    JS_EXPORT_PRIVATE JITCallee(Wasm::CompilationMode);
-    JS_EXPORT_PRIVATE JITCallee(Wasm::CompilationMode, size_t, std::pair<const Name*, RefPtr<NameSection>>&&);
-
-    std::tuple<void*, void*> rangeImpl() const
-    {
-        void* start = m_entrypoint.compilation->codeRef().executableMemory()->start().untaggedPtr();
-        void* end = m_entrypoint.compilation->codeRef().executableMemory()->end().untaggedPtr();
-        return { start, end };
-    }
-
-    CodePtr<WasmEntryPtrTag> entrypointImpl() const { return m_entrypoint.compilation->code().retagged<WasmEntryPtrTag>(); }
-
-    RegisterAtOffsetList* calleeSaveRegistersImpl() { return &m_entrypoint.calleeSaveRegisters; }
-
-    void setEntrypoint(Wasm::Entrypoint&&);
-
-    FixedVector<UnlinkedWasmToWasmCall> m_wasmToWasmCallsites;
-    Wasm::Entrypoint m_entrypoint;
-};
-
-class JSEntrypointCallee final : public JITCallee {
-public:
-    static Ref<JSEntrypointCallee> create()
-    {
-        return adoptRef(*new JSEntrypointCallee);
-    }
-
-    using JITCallee::setEntrypoint;
-
-private:
-    JSEntrypointCallee()
-        : JITCallee(Wasm::CompilationMode::JSEntrypointMode)
-    {
-    }
-};
+//class JITCallee : public Callee {
+//public:
+//    friend class Callee;
+//    FixedVector<UnlinkedWasmToWasmCall>& wasmToWasmCallsites() { return m_wasmToWasmCallsites; }
+//
+//protected:
+//    JS_EXPORT_PRIVATE JITCallee(Wasm::CompilationMode);
+//    JS_EXPORT_PRIVATE JITCallee(Wasm::CompilationMode, size_t, std::pair<const Name*, RefPtr<NameSection>>&&);
+//
+//    std::tuple<void*, void*> rangeImpl() const
+//    {
+//        void* start = m_entrypoint.compilation->codeRef().executableMemory()->start().untaggedPtr();
+//        void* end = m_entrypoint.compilation->codeRef().executableMemory()->end().untaggedPtr();
+//        return { start, end };
+//    }
+//
+//    CodePtr<WasmEntryPtrTag> entrypointImpl() const { return m_entrypoint.compilation->code().retagged<WasmEntryPtrTag>(); }
+//
+//    RegisterAtOffsetList* calleeSaveRegistersImpl() { return &m_entrypoint.calleeSaveRegisters; }
+//
+//    void setEntrypoint(Wasm::Entrypoint&&);
+//
+//    FixedVector<UnlinkedWasmToWasmCall> m_wasmToWasmCallsites;
+//    Wasm::Entrypoint m_entrypoint;
+//};
+//
+//class JSEntrypointCallee final : public JITCallee {
+//public:
+//    static Ref<JSEntrypointCallee> create()
+//    {
+//        return adoptRef(*new JSEntrypointCallee);
+//    }
+//
+//    using JITCallee::setEntrypoint;
+//
+//private:
+//    JSEntrypointCallee()
+//        : JITCallee(Wasm::CompilationMode::JSEntrypointMode)
+//    {
+//    }
+//};
 
 class WasmToJSCallee final : public Callee {
 public:
@@ -149,21 +149,21 @@ private:
 };
 
 
-class JSToWasmICCallee final : public JITCallee {
-public:
-    static Ref<JSToWasmICCallee> create()
-    {
-        return adoptRef(*new JSToWasmICCallee);
-    }
-
-    using JITCallee::setEntrypoint;
-
-private:
-    JSToWasmICCallee()
-        : JITCallee(Wasm::CompilationMode::JSToWasmICMode)
-    {
-    }
-};
+//class JSToWasmICCallee final : public JITCallee {
+//public:
+//    static Ref<JSToWasmICCallee> create()
+//    {
+//        return adoptRef(*new JSToWasmICCallee);
+//    }
+//
+//    using JITCallee::setEntrypoint;
+//
+//private:
+//    JSToWasmICCallee()
+//        : JITCallee(Wasm::CompilationMode::JSToWasmICMode)
+//    {
+//    }
+//};
 
 
 #if ENABLE(WEBASSEMBLY_B3JIT)

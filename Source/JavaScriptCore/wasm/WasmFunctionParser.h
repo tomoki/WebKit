@@ -350,8 +350,8 @@ auto FunctionParser<Context>::parseBody() -> PartialResult
 
         m_currentOpcode = static_cast<OpType>(op);
 
-        if (UNLIKELY(Options::dumpWasmOpcodeStatistics()))
-            WasmOpcodeCounter::singleton().increment(m_currentOpcode);
+        //if (UNLIKELY(Options::dumpWasmOpcodeStatistics()))
+        //    WasmOpcodeCounter::singleton().increment(m_currentOpcode);
 
         if (verbose) {
             dataLogLn("processing op (", m_unreachableBlocks, "): ",  RawHex(op), ", ", makeString(static_cast<OpType>(op)), " at offset: ", RawHex(m_offset));
@@ -2236,8 +2236,8 @@ FOR_EACH_WASM_MEMORY_STORE_OP(CREATE_CASE)
 
         ExtAtomicOpType op = static_cast<ExtAtomicOpType>(extOp);
 
-        if (UNLIKELY(Options::dumpWasmOpcodeStatistics()))
-            WasmOpcodeCounter::singleton().increment(op);
+        //if (UNLIKELY(Options::dumpWasmOpcodeStatistics()))
+        //    WasmOpcodeCounter::singleton().increment(op);
 
         switch (op) {
 #define CREATE_CASE(name, id, b3op, inc, memoryType) case ExtAtomicOpType::name: return atomicLoad(op, Types::memoryType);
@@ -3301,8 +3301,8 @@ auto FunctionParser<Context>::parseUnreachableExpression() -> PartialResult
 
         ExtGCOpType op = static_cast<ExtGCOpType>(extOp);
 
-        if (UNLIKELY(Options::dumpWasmOpcodeStatistics()))
-            WasmOpcodeCounter::singleton().increment(op);
+        //if (UNLIKELY(Options::dumpWasmOpcodeStatistics()))
+        //    WasmOpcodeCounter::singleton().increment(op);
 
         switch (op) {
         case ExtGCOpType::I31New:

@@ -757,12 +757,16 @@ JSC_DEFINE_JIT_OPERATION(operationWasmWriteBarrierSlowPath, void, (JSCell* cell,
 
 JSC_DEFINE_JIT_OPERATION(operationPopcount32, uint32_t, (int32_t value))
 {
-    return __builtin_popcount(value);
+    uint32_t temp;
+    std::memcpy(&temp, &value, sizeof(uint32_t));
+    return std::popcount(temp);
 }
 
 JSC_DEFINE_JIT_OPERATION(operationPopcount64, uint64_t, (int64_t value))
 {
-    return __builtin_popcountll(value);
+    uint64_t temp;
+    std::memcpy(&temp, &value, sizeof(uint64_t));
+    return std::popcount(temp);
 }
 
 JSC_DEFINE_JIT_OPERATION(operationGrowMemory, int32_t, (Instance* instance, int32_t delta))

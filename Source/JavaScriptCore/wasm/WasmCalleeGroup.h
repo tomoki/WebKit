@@ -79,16 +79,16 @@ public:
 
     // These two callee getters are only valid once the callees have been populated.
 
-    Callee& jsEntrypointCalleeFromFunctionIndexSpace(unsigned functionIndexSpace)
-    {
-        ASSERT(runnable());
-        RELEASE_ASSERT(functionIndexSpace >= functionImportCount());
-        unsigned calleeIndex = functionIndexSpace - functionImportCount();
+    //Callee& jsEntrypointCalleeFromFunctionIndexSpace(unsigned functionIndexSpace)
+    //{
+    //    ASSERT(runnable());
+    //    RELEASE_ASSERT(functionIndexSpace >= functionImportCount());
+    //    unsigned calleeIndex = functionIndexSpace - functionImportCount();
 
-        auto callee = m_jsEntrypointCallees.get(calleeIndex);
-        RELEASE_ASSERT(callee);
-        return *callee;
-    }
+    //    auto callee = m_jsEntrypointCallees.get(calleeIndex);
+    //    RELEASE_ASSERT(callee);
+    //    return *callee;
+    //}
 
     Callee& wasmEntrypointCalleeFromFunctionIndexSpace(const AbstractLocker&, unsigned functionIndexSpace)
     {
@@ -182,7 +182,7 @@ private:
     FixedVector<RefPtr<BBQCallee>> m_bbqCallees;
 #endif
     RefPtr<LLIntCallees> m_llintCallees;
-    HashMap<uint32_t, RefPtr<JSEntrypointCallee>, DefaultHash<uint32_t>, WTF::UnsignedWithZeroKeyHashTraits<uint32_t>> m_jsEntrypointCallees;
+    //HashMap<uint32_t, RefPtr<JSEntrypointCallee>, DefaultHash<uint32_t>, WTF::UnsignedWithZeroKeyHashTraits<uint32_t>> m_jsEntrypointCallees;
     FixedVector<CodePtr<WasmEntryPtrTag>> m_wasmIndirectCallEntryPoints;
     FixedVector<MacroAssemblerCodeRef<WasmEntryPtrTag>> m_wasmToWasmExitStubs;
     RefPtr<EntryPlan> m_plan;

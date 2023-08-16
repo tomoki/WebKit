@@ -202,18 +202,19 @@ void StackVisitor::readInlinableWasmFrame(CallFrame* callFrame)
     if (!canInline)
         return;
 
-    const auto& omgCallee = *static_cast<const Wasm::OptimizingJITCallee*>(&callee);
-    bool isInlined = false;
-    auto origin = omgCallee.getOrigin(csi, depth, isInlined);
+    //const auto& omgCallee = *static_cast<const Wasm::OptimizingJITCallee*>(&callee);
+    //bool isInlined = false;
+    //auto origin = omgCallee.getOrigin(csi, depth, isInlined);
 
-    if (!isInlined)
-        return;
+    //if (!isInlined)
+    //    return;
+    return;
 
     // The callerFrame just needs to be non-null to indicate that we
     // haven't reached the last frame yet.
-    m_frame.m_callerFrame = callFrame;
-    m_frame.m_wasmDistanceFromDeepestInlineFrame = depth + 1;
-    m_frame.m_wasmFunctionIndexOrName = origin;
+    //m_frame.m_callerFrame = callFrame;
+    //m_frame.m_wasmDistanceFromDeepestInlineFrame = depth + 1;
+    //m_frame.m_wasmFunctionIndexOrName = origin;
 #else
     UNUSED_PARAM(callFrame);
 #endif

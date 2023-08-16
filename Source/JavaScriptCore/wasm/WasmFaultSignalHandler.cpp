@@ -50,55 +50,55 @@ static constexpr bool verbose = false;
 }
 }
 
-static SignalAction trapHandler(Signal signal, SigInfo& sigInfo, PlatformRegisters& context)
-{
-    RELEASE_ASSERT(signal == Signal::AccessFault);
-
-    auto instructionPointer = MachineContext::instructionPointer(context);
-    if (!instructionPointer)
-        return SignalAction::NotHandled;
-    void* faultingInstruction = instructionPointer->untaggedPtr();
-    dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "starting handler for fault at: ", RawPointer(faultingInstruction));
-
-    dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "JIT memory start: ", RawPointer(startOfFixedExecutableMemoryPool()), " end: ", RawPointer(endOfFixedExecutableMemoryPool()));
-    dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "WasmLLInt memory start: ", RawPointer(untagCodePtr<void*, CFunctionPtrTag>(LLInt::wasmLLIntPCRangeStart)), " end: ", RawPointer(untagCodePtr<void*, CFunctionPtrTag>(LLInt::wasmLLIntPCRangeEnd)));
-    // First we need to make sure we are in JIT code or Wasm LLInt code before we can aquire any locks. Otherwise,
-    // we might have crashed in code that is already holding one of the locks we want to aquire.
-    assertIsNotTagged(faultingInstruction);
-    if (isJITPC(faultingInstruction) || LLInt::isWasmLLIntPC(faultingInstruction)) {
-        bool faultedInActiveGrowableMemory = false;
-        {
-            void* faultingAddress = sigInfo.faultingAddress;
-            dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "checking faulting address: ", RawPointer(faultingAddress), " is in an active fast memory");
-            faultedInActiveGrowableMemory = Wasm::Memory::addressIsInGrowableOrFastMemory(faultingAddress);
-        }
-        if (faultedInActiveGrowableMemory) {
-            dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "found active fast memory for faulting address");
-
-            auto didFaultInWasm = [](void* faultingInstruction) {
-                if (LLInt::isWasmLLIntPC(faultingInstruction))
-                    return true;
-                auto& calleeRegistry = CalleeRegistry::singleton();
-                Locker locker { calleeRegistry.getLock() };
-                for (auto* callee : calleeRegistry.allCallees()) {
-                    auto [start, end] = callee->range();
-                    dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "function start: ", RawPointer(start), " end: ", RawPointer(end));
-                    if (start <= faultingInstruction && faultingInstruction < end) {
-                        dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "found match");
-                        return true;
-                    }
-                }
-                return false;
-            };
-
-            if (didFaultInWasm(faultingInstruction)) {
-                MachineContext::setInstructionPointer(context, LLInt::getCodePtr<CFunctionPtrTag>(wasm_throw_from_fault_handler_trampoline_reg_instance));
-                return SignalAction::Handled;
-            }
-        }
-    }
-    return SignalAction::NotHandled;
-}
+//static SignalAction trapHandler(Signal signal, SigInfo& sigInfo, PlatformRegisters& context)
+//{
+//    RELEASE_ASSERT(signal == Signal::AccessFault);
+//
+//    auto instructionPointer = MachineContext::instructionPointer(context);
+//    if (!instructionPointer)
+//        return SignalAction::NotHandled;
+//    void* faultingInstruction = instructionPointer->untaggedPtr();
+//    dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "starting handler for fault at: ", RawPointer(faultingInstruction));
+//
+//    dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "JIT memory start: ", RawPointer(startOfFixedExecutableMemoryPool()), " end: ", RawPointer(endOfFixedExecutableMemoryPool()));
+//    dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "WasmLLInt memory start: ", RawPointer(untagCodePtr<void*, CFunctionPtrTag>(LLInt::wasmLLIntPCRangeStart)), " end: ", RawPointer(untagCodePtr<void*, CFunctionPtrTag>(LLInt::wasmLLIntPCRangeEnd)));
+//    // First we need to make sure we are in JIT code or Wasm LLInt code before we can aquire any locks. Otherwise,
+//    // we might have crashed in code that is already holding one of the locks we want to aquire.
+//    assertIsNotTagged(faultingInstruction);
+//    if (isJITPC(faultingInstruction) || LLInt::isWasmLLIntPC(faultingInstruction)) {
+//        bool faultedInActiveGrowableMemory = false;
+//        {
+//            void* faultingAddress = sigInfo.faultingAddress;
+//            dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "checking faulting address: ", RawPointer(faultingAddress), " is in an active fast memory");
+//            faultedInActiveGrowableMemory = Wasm::Memory::addressIsInGrowableOrFastMemory(faultingAddress);
+//        }
+//        if (faultedInActiveGrowableMemory) {
+//            dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "found active fast memory for faulting address");
+//
+//            auto didFaultInWasm = [](void* faultingInstruction) {
+//                if (LLInt::isWasmLLIntPC(faultingInstruction))
+//                    return true;
+//                auto& calleeRegistry = CalleeRegistry::singleton();
+//                Locker locker { calleeRegistry.getLock() };
+//                for (auto* callee : calleeRegistry.allCallees()) {
+//                    auto [start, end] = callee->range();
+//                    dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "function start: ", RawPointer(start), " end: ", RawPointer(end));
+//                    if (start <= faultingInstruction && faultingInstruction < end) {
+//                        dataLogLnIf(WasmFaultSignalHandlerInternal::verbose, "found match");
+//                        return true;
+//                    }
+//                }
+//                return false;
+//            };
+//
+//            if (didFaultInWasm(faultingInstruction)) {
+//                MachineContext::setInstructionPointer(context, LLInt::getCodePtr<CFunctionPtrTag>(wasm_throw_from_fault_handler_trampoline_reg_instance));
+//                return SignalAction::Handled;
+//            }
+//        }
+//    }
+//    return SignalAction::NotHandled;
+//}
 
 void activateSignalingMemory()
 {
@@ -110,7 +110,7 @@ void activateSignalingMemory()
         if (!Options::useWasmFaultSignalHandler())
             return;
 
-        activateSignalHandlersFor(Signal::AccessFault);
+        //activateSignalHandlersFor(Signal::AccessFault);
     });
 }
 
@@ -124,9 +124,9 @@ void prepareSignalingMemory()
         if (!Options::useWasmFaultSignalHandler())
             return;
 
-        addSignalHandler(Signal::AccessFault, [] (Signal signal, SigInfo& sigInfo, PlatformRegisters& ucontext) {
-            return trapHandler(signal, sigInfo, ucontext);
-        });
+        //addSignalHandler(Signal::AccessFault, [] (Signal signal, SigInfo& sigInfo, PlatformRegisters& ucontext) {
+        //    return trapHandler(signal, sigInfo, ucontext);
+        //});
     });
 }
     

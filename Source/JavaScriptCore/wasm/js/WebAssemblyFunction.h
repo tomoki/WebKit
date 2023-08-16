@@ -67,8 +67,8 @@ public:
 
     CodePtr<JSEntryPtrTag> jsCallEntrypoint()
     {
-        if (m_jsToWasmICCallee)
-            return m_jsToWasmICCallee->entrypoint().retagged<JSEntryPtrTag>();
+        //if (m_jsToWasmICCallee)
+        //    return m_jsToWasmICCallee->entrypoint().retagged<JSEntryPtrTag>();
         return jsCallEntrypointSlow();
     }
 
@@ -86,7 +86,7 @@ private:
     // to our Instance, which points to the Module that exported us, which
     // ensures that the actual Signature/code doesn't get deallocated.
     CodePtr<WasmEntryPtrTag> m_jsEntrypoint;
-    RefPtr<Wasm::JSToWasmICCallee> m_jsToWasmICCallee;
+    //RefPtr<Wasm::JSToWasmICCallee> m_jsToWasmICCallee;
 };
 
 } // namespace JSC

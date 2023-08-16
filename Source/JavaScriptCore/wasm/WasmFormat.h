@@ -639,8 +639,8 @@ struct InternalFunction {
     StackMaps stackmaps;
 #endif
     Vector<UnlinkedHandlerInfo> exceptionHandlers;
-    Vector<CCallHelpers::Label> bbqLoopEntrypoints;
-    std::optional<CCallHelpers::Label> bbqSharedLoopEntrypoint;
+    //Vector<CCallHelpers::Label> bbqLoopEntrypoints;
+    //std::optional<CCallHelpers::Label> bbqSharedLoopEntrypoint;
     Entrypoint entrypoint;
     unsigned osrEntryScratchBufferSize { 0 };
 };
